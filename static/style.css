@@ -1,0 +1,10 @@
+#modal-fieldset {
+	border: 1px groove #ddd !important;
+}
+
+#modal-legend {
+	width: inherit !important;
+	padding: 0px 10px !important;
+	margin-left: 10px;
+	border-bottom: none !important;
+}
