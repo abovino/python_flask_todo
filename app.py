@@ -140,11 +140,40 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-	return render_template('dashboard.html')
+	# Render all users tasks ...
+	# Create cursor
+	cur = mysql.connection.cursor()
+
+	# Get tasks by userId
+	userId = str(session['userId'])
+	data = cur.execute("SELECT * FROM todos WHERE created_by_id = %s", userId)
+
+	# Fetch all tasks in dictionary form to make tasks iterable
+	tasks = cur.fetchall()
+	for i in range(len(tasks)):
+		due_date = str(tasks[i]['due_date'])
+		create_date = str(tasks[i]['create_date'])
+		update_date = str(tasks[i]['update_date'])
+
+		if due_date != 'None':
+			a = time.strptime(due_date, '%Y-%m-%d %H:%M:%S')
+			tasks[i]['due_date'] = time.strftime('%m/%d/%Y @ %I:%M %p', a)
+		
+		a = time.strptime(create_date, '%Y-%m-%d %H:%M:%S')
+		tasks[i]['create_date'] = time.strftime('%m/%d/%Y', a)
+
+		a = time.strptime(update_date, '%Y-%m-%d %H:%M:%S')
+		tasks[i]['update_date'] = time.strftime('%m/%d/%Y', a)
+
+		tasks[i]['sequence'] = str(i + 1)
+
+	# Close connection
+	cur.close()
+	return render_template('dashboard.html', tasks = tasks)
 
 class TaskForm(Form):
 	task = StringField('Task', [validators.Length(min=1, max=125)])
-	body = StringField('Body', [validators.Length(min=1, max=500)])
+	details = StringField('Details', [validators.Length(min=1, max=500)])
 	# date = DateField('Date', format='%Y-%m-%d')
 	# time = DateTimeField('Time', format='%H:%M:%S')
 	
@@ -154,7 +183,7 @@ def add_task():
 	form = TaskForm(request.form)
 	if request.method == 'POST' and form.validate():
 		task = form.task.data
-		body = form.body.data
+		details = form.details.data
 
 		# If user does not enter date/time then insert NULL in 'due_date' DB column
 		if len(request.form['date']) < 1:
@@ -170,7 +199,7 @@ def add_task():
 		# Execute query
 		print(type(session['userId']))
 		print(session['userId'])
-		cur.execute('INSERT INTO todos(task, body, created_by_id, due_date) VALUES(%s, %s, %s, %s)', (task, body, session['userId'], due_date))
+		cur.execute('INSERT INTO todos(task, details, created_by_id, due_date) VALUES(%s, %s, %s, %s)', (task, details, session['userId'], due_date))
 
 		# Commit to DB
 		mysql.connection.commit()
