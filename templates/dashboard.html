@@ -2,6 +2,11 @@
 
 {% block body %}
 	<h1>Dashboard <small>Welcome, {{session.username}}</small></h1>
-	<a href="/add_task" class="btn btn-success">Add New Task</a>
+	<button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">
+		Add New Task
+	</button>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		{% include 'add_task.html' %}
+	</div>
 	{% include 'includes/_tasklist.html' %}
 {% endblock %}
