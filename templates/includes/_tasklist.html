@@ -1,0 +1,20 @@
+<table class="table table-responsive">
+	<tr>
+		<th>#</th>
+		<th>Task</th>
+		<th>Details</th>
+		<th>Due</th>
+		<th>Date Created</th>
+		<th>Last Modified</th>
+	</tr>
+	{% for task in tasks %}
+	<tr>
+		<td>{{task.sequence}}</td>
+		<td>{{task.task}}</td>
+		<td>{{task.details}}</td>
+		<td>{{task.due_date}}</td>
+		<td>{{task.create_date}}</td>
+		<td>{{task.update_date}}</td>
+	</tr>
+	{% endfor %}
+</table>
