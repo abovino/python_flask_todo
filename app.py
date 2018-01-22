@@ -1,9 +1,11 @@
 from flask import Flask, render_template, flash, request, redirect, url_for, session, logging
 from data import Articles
 from flask_mysqldb import MySQL
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, TextAreaField, DateTimeField, PasswordField, validators
+from wtforms.fields.html5 import DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
+import time
 
 app = Flask(__name__)
 app.secret_key='secret123'
@@ -93,12 +95,14 @@ def login():
 			# Get stored hash
 			data = cur.fetchone()
 			password = data['password']
+			userId = data['id']
 
 			# Compare passwords
 			if sha256_crypt.verify(password_candidate, password):
 				# Passed
 				session['logged_in'] = True
 				session['username'] = username
+				session['userId'] = userId
 
 				flash('You are now logged in', 'success')
 				return redirect(url_for('dashboard'))
@@ -126,6 +130,7 @@ def is_logged_in(f):
 
 # Logout
 @app.route('/logout')
+@is_logged_in
 def logout():
 	session.clear()
 	flash('You are now logged out', 'success')
@@ -136,3 +141,37 @@ def logout():
 @is_logged_in
 def dashboard():
 	return render_template('dashboard.html')
+
+class TaskForm(Form):
+	task = StringField('Task', [validators.Length(min=1, max=125)])
+	body = StringField('Body', [validators.Length(min=1, max=500)])
+	# date = DateField('Date', format='%Y-%m-%d')
+	# time = DateTimeField('Time', format='%H:%M:%S')
+	
+@app.route('/add_task', methods=['GET', 'POST'])
+@is_logged_in
+def add_task():
+	form = TaskForm(request.form)
+	if request.method == 'POST' and form.validate():
+		task = form.task.data
+		body = form.body.data
+		due_date = request.form['date'] + ' ' + request.form['time']
+		mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+		due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		
+		# Create Cursor
+		cur = mysql.connection.cursor()
+		
+		# Execute query
+		print(type(session['userId']))
+		print(session['userId'])
+		cur.execute('INSERT INTO todos(task, body, created_by_id, due_date) VALUES(%s, %s, %s, %s)', (task, body, session['userId'], due_date))
+
+		# Commit to DB
+		mysql.connection.commit()
+
+		# Close connection to DB
+		cur.close()
+		return redirect(url_for('dashboard'))
+
+	return render_template('add_task.html', form=form)
