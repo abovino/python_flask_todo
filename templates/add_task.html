@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<h1>Add Task</h1>
+	{% from "includes/_formhelpers.html" import render_field %}
+	<form action="" method="POST">
+		<div class="form-group">
+			{{render_field(form.task, class_="form-control")}}
+		</div>
+		<div class="form-group">
+			{{render_field(form.body, class_="form-control")}}
+		</div>
+		<div class="form-group">
+			<input type="date" class="form-control" name="date">
+		</div>
+		<div class="form-group">
+			<input type="time" class="form-control" name="time">
+		</div>
+		<p><input type="submit" class="btn btn-primary" value="Submit"></p>
+	</form>
+{% endblock %}
