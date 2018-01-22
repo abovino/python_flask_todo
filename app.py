@@ -155,9 +155,14 @@ def add_task():
 	if request.method == 'POST' and form.validate():
 		task = form.task.data
 		body = form.body.data
-		due_date = request.form['date'] + ' ' + request.form['time']
-		mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
-		due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+
+		# If user does not enter date/time then insert NULL in 'due_date' DB column
+		if len(request.form['date']) < 1:
+			due_date = None
+		else:
+			due_date = request.form['date'] + ' ' + request.form['time']
+			mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+			due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
 		
 		# Create Cursor
 		cur = mysql.connection.cursor()
