@@ -1,0 +1,46 @@
+{% block body %}
+	{% from "includes/_formhelpers.html" import render_field %}
+
+<!-- Modal -->
+{% for task in tasks %}
+<div class="modal fade" id="task_id_{{task.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">Add New Task</h4>
+			</div>
+			<div class="modal-body">
+				<form action="/edit_task" method="POST">
+					<div class="form-group">
+						<label for="task">Task</label>
+						<input type="text" class="form-control" name="task" value="{{task.task}}">
+					</div>
+					<div class="form-group">
+						<label for="details">Details</label>
+						<textarea name="details" class="form-control" rows="3">{{task.details}}</textarea>
+					</div>
+					<fieldset id="modal-fieldset">
+						<legend id="modal-legend"><input type="checkbox" id="enable-date-edit" data="{{task.id}}" {% if task.defaultDateHtml %}checked{% else %}{% endif %}> Assign due date and time</legend>
+						<div class="form-inline due-date-form">
+							<div class="form-group">
+								<label for="date">Date</label>
+								<input  type="date" class="form-control date-switch-{{task.id}}" name="date" value="{{task.defaultDateHtml}}" {% if task.defaultDateHtml %}{% else %}disabled{% endif %}>
+							</div>
+							<div class="form-group">
+								<label for="time">Time</label>
+								<input  type="time" class="form-control date-switch-{{task.id}}" name="time" value="{{task.defaultTimeHtml}}" {% if task.defaultTimeHtml %}{% else %}disabled{% endif %}>
+							</div>
+						</div>
+					</fieldset>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<p><input type="submit" class="btn btn-primary" value="Submit"></p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+{% endfor %}
+{% endblock %}
