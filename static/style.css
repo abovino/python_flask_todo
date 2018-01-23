@@ -8,3 +8,7 @@
 	margin-left: 10px;
 	border-bottom: none !important;
 }
+
+.due-date-form {
+	padding: 0 0 15px 15px;
+}
