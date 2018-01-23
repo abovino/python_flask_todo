@@ -17,6 +17,29 @@
 	<script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	<script>
+		$(document).on('change', '#enable-date-edit', function(e) {
+			// Get task id which was passed through templates to access specific modal
+			let id = $(this).attr('data');
+			let dateSwitchClass = '.date-switch-' + id.toString()
+			// Enable/disable task form date and time fields when fieldset checkbox is clicked
+			$(dateSwitchClass).each(function(element) {
+				console.log(element)
+				let elementAttrs = [];
+				
+				$.each(this.attributes, function(k, a) {
+					console.log(k, a.name, a.value)
+					elementAttrs.push(a.name)
+				});
+
+				if (elementAttrs.indexOf('disabled') > -1) {
+					$(this).prop('disabled', false);
+				} else {
+					$(this).prop('disabled', true);
+				}
+
+			});
+		});
+
 		$(document).on('change', '#enable-date', function(e) {
 			// Enable/disable task form date and time fields when fieldset checkbox is clicked
 			$('.enable-disable').each(function(element) {
@@ -35,7 +58,6 @@
 				}
 
 			});
-
 		});
 	</script>
 </body>
