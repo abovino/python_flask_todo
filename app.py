@@ -158,6 +158,10 @@ def dashboard():
 		if due_date != 'None':
 			a = time.strptime(due_date, '%Y-%m-%d %H:%M:%S')
 			tasks[i]['due_date'] = time.strftime('%m/%d/%Y @ %I:%M %p', a)
+			tasks[i]['defaultDateHtml'] = time.strftime('%Y-%m-%d')
+			tasks[i]['defaultTimeHtml'] = time.strftime('%H:%M', a)
+			print('**************')
+			print(tasks[i]['defaultTimeHtml'])
 		
 		a = time.strptime(create_date, '%Y-%m-%d %H:%M:%S')
 		tasks[i]['create_date'] = time.strftime('%m/%d/%Y', a)
@@ -184,14 +188,16 @@ def add_task():
 	if request.method == 'POST' and form.validate():
 		task = form.task.data
 		details = form.details.data
-
-		# If user does not enter date/time then insert NULL in 'due_date' DB column
-		if len(request.form['date']) < 1:
-			due_date = None
-		else:
-			due_date = request.form['date'] + ' ' + request.form['time']
-			mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
-			due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		due_date = None # Initially assign NULL so if due date was not provided by user NULL is inserted in DB
+		for inputs in request.form:
+			if 'date' in inputs:
+				# If user does not enter date/time then insert NULL in 'due_date' DB column
+				if len(request.form['date']) < 1:
+					due_date = None
+				else:
+					due_date = request.form['date'] + ' ' + request.form['time']
+					mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+					due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
 		
 		# Create Cursor
 		cur = mysql.connection.cursor()
