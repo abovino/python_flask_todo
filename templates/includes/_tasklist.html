@@ -1,21 +1,22 @@
 <div class="table-responsive">
 	<table class="table">
 		<tr>
-			<th>#</th>
-			<th>Task</th>
-			<th>Details</th>
-			<th>Due</th>
-			<th>Date Created</th>
-			<th>Last Modified</th>
+			<th class="col-sm-1 text-center">#</th>
+			<th class="col-sm-2">Task</th>
+			<th class="col-sm-4">Details</th>
+			<th class="col-sm-2">Due</th>
+			<th class="col-sm-1">Created</th>
+			<th class="col-sm-1">Modified</th>
 		</tr>
 		{% for task in tasks %}
 		<tr>
-			<td>{{task.sequence}}</td>
+			<td class="text-center">{{task.sequence}}</td>
 			<td>{{task.task}}</td>
 			<td>{{task.details}}</td>
 			<td>{{task.due_date}}</td>
 			<td>{{task.create_date}}</td>
 			<td>{{task.update_date}}</td>
+			<td><button type="button" class="btn btn-success" data-toggle="modal" data-target="#task_id_{{task.id}}">Edit</button></td>
 		</tr>
 		{% endfor %}
 	</table>
