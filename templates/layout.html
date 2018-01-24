@@ -53,8 +53,10 @@
 
 				if (elementAttrs.indexOf('disabled') > -1) {
 					$(this).prop('disabled', false);
+					$('#date-time-inputs').removeClass('disabled-inputs')
 				} else {
 					$(this).prop('disabled', true);
+					$('#date-time-inputs').addClass('disabled-inputs')
 				}
 
 			});
