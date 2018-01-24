@@ -11,7 +11,7 @@
 				<h4 class="modal-title" id="myModalLabel">Add New Task</h4>
 			</div>
 			<div class="modal-body">
-				<form action="/edit_task" method="POST">
+				<form action="/edit_task/{{task.id}}" method="POST">
 					<div class="form-group">
 						<label for="task">Task</label>
 						<input type="text" class="form-control" name="task" value="{{task.task}}">
