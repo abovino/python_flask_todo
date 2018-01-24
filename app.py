@@ -1,11 +1,10 @@
 from flask import Flask, render_template, flash, request, redirect, url_for, session, logging
-from data import Articles
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, DateTimeField, PasswordField, validators
 from wtforms.fields.html5 import DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
-import time
+import time, datetime, calendar
 
 app = Flask(__name__)
 app.secret_key='secret123'
@@ -19,8 +18,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 # init MYSQL
 mysql = MySQL(app)
-
-Articles = Articles()
 
 # if __name__ == '__main__':
 # 	app.run() # Runs the app ... no env var needed
@@ -146,7 +143,7 @@ def dashboard():
 
 	# Get tasks by userId
 	userId = str(session['userId'])
-	data = cur.execute("SELECT * FROM todos WHERE created_by_id = %s", userId)
+	data = cur.execute("SELECT * FROM todos WHERE created_by_id = %s ORDER BY -due_date DESC", userId)
 
 	# Fetch all tasks in dictionary form to make tasks iterable
 	tasks = cur.fetchall()
@@ -154,15 +151,17 @@ def dashboard():
 		due_date = str(tasks[i]['due_date'])
 		create_date = str(tasks[i]['create_date'])
 		update_date = str(tasks[i]['update_date'])
-
+		
+		# print(due_date, create_date, update_date)
 		if due_date != 'None':
 			a = time.strptime(due_date, '%Y-%m-%d %H:%M:%S')
 			tasks[i]['due_date'] = time.strftime('%m/%d/%Y @ %I:%M %p', a)
 			tasks[i]['defaultDateHtml'] = time.strftime('%Y-%m-%d')
 			tasks[i]['defaultTimeHtml'] = time.strftime('%H:%M', a)
-			print('**************')
-			print(tasks[i]['defaultTimeHtml'])
-		
+			tasks[i]['prettyDueDate'] = time.strftime('%b %d, %Y %I:%M %p', a)
+			tasks[i]['prettyDueTime'] = time.strftime('%b %d, %Y', a)
+			# print(tasks[i]['prettyDueDate'])
+
 		a = time.strptime(create_date, '%Y-%m-%d %H:%M:%S')
 		tasks[i]['create_date'] = time.strftime('%m/%d/%Y', a)
 
@@ -184,10 +183,10 @@ class TaskForm(Form):
 @app.route('/add_task', methods=['GET', 'POST'])
 @is_logged_in
 def add_task():
-	form = TaskForm(request.form)
-	if request.method == 'POST' and form.validate():
-		task = form.task.data
-		details = form.details.data
+	# form = TaskForm(request.form)
+	if request.method == 'POST':
+		task = request.form['task']
+		details = request.form['details']
 		due_date = None # Initially assign NULL so if due date was not provided by user NULL is inserted in DB
 		for inputs in request.form:
 			if 'date' in inputs:
@@ -203,9 +202,44 @@ def add_task():
 		cur = mysql.connection.cursor()
 		
 		# Execute query
-		print(type(session['userId']))
-		print(session['userId'])
 		cur.execute('INSERT INTO todos(task, details, created_by_id, due_date) VALUES(%s, %s, %s, %s)', (task, details, session['userId'], due_date))
+
+		# Commit to DB
+		mysql.connection.commit()
+
+		# Close connection to DB
+		cur.close()
+		return redirect(url_for('dashboard'))
+
+	return render_template('add_task.html', form=form)
+
+@app.route('/edit_task/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_task(id):
+	# form = TaskForm(request.form)
+	if request.method == 'POST':
+		task = request.form['task']
+		details = request.form['details']
+		due_date = None # Initially assign NULL so if due date was not provided by user NULL is inserted in DB
+		for inputs in request.form:
+			if 'date' in inputs:
+				# If user does not enter date/time then insert NULL in 'due_date' DB column
+				if len(request.form['date']) < 1:
+					due_date = None
+				else:
+					due_date = request.form['date'] + ' ' + request.form['time']
+					mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+					due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		
+		update_date = datetime.datetime.now()
+		# mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+		# due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		
+		# Create Cursor
+		cur = mysql.connection.cursor()
+		
+		# Execute query
+		cur.execute('UPDATE todos SET task=%s, details=%s, due_date=%s, update_date=%s WHERE id=%s AND created_by_id=%s', (task, details, due_date, update_date, id, session['userId']))
 
 		# Commit to DB
 		mysql.connection.commit()
