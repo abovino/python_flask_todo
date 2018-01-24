@@ -1,22 +1,19 @@
 <div class="table-responsive">
-	<table class="table">
+	<table class="table table-hover">
 		<tr>
 			<th class="col-sm-1 text-center">#</th>
 			<th class="col-sm-2">Task</th>
-			<th class="col-sm-4">Details</th>
+			<th class="col-sm-3">Details</th>
 			<th class="col-sm-2">Due</th>
 			<th class="col-sm-1">Created</th>
-			<th class="col-sm-1">Modified</th>
 		</tr>
 		{% for task in tasks %}
-		<tr>
+		<tr type="button" class="task-row-btn" data-toggle="modal" data-target="#task_id_{{task.id}}">
 			<td class="text-center">{{task.sequence}}</td>
 			<td>{{task.task}}</td>
 			<td>{{task.details}}</td>
-			<td>{{task.due_date}}</td>
+			<td>{{task.prettyDueDate}}</td>
 			<td>{{task.create_date}}</td>
-			<td>{{task.update_date}}</td>
-			<td><button type="button" class="btn btn-success" data-toggle="modal" data-target="#task_id_{{task.id}}">Edit</button></td>
 		</tr>
 		{% endfor %}
 	</table>
