@@ -9,6 +9,19 @@
 	border-bottom: none !important;
 }
 
+.disabled-inputs {
+	opacity: .5;
+}
+
 .due-date-form {
 	padding: 0 0 15px 15px;
+}
+
+.task-row-btn {
+	cursor: pointer;
+}
+
+/* mozilla responsive table hack  */
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
 }
