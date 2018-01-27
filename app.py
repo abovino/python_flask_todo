@@ -48,29 +48,29 @@ class RegisterForm(Form):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-		form = RegisterForm(request.form)
-		if request.method == 'POST' and form.validate():
-			name = form.name.data
-			email = form.email.data
-			username = form.username.data
-			password = sha256_crypt.encrypt(str(form.password.data))
+	form = RegisterForm(request.form)
+	if request.method == 'POST' and form.validate():
+		name = form.name.data
+		email = form.email.data
+		username = form.username.data
+		password = sha256_crypt.encrypt(str(form.password.data))
 
-			# Create cursor for MySQL
-			cur = mysql.connection.cursor()
-			
-			# Execute query
-			cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
+		# Create cursor for MySQL
+		cur = mysql.connection.cursor()
+		
+		# Execute query
+		cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
 
-			# Commit to DB
-			mysql.connection.commit()
+		# Commit to DB
+		mysql.connection.commit()
 
-			# Close connection to DB
-			cur.close()
+		# Close connection to DB
+		cur.close()
 
-			flash('You are now registered and can log in', 'success')
+		flash('You are now registered and can log in', 'success')
 
-			return redirect(url_for('login'))
-		return render_template('register.html', form=form)
+		return redirect(url_for('login'))
+	return render_template('register.html', form=form)
 
 # User login
 @app.route('/login', methods=['GET', 'POST'])
