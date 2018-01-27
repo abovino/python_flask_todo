@@ -1,20 +1,46 @@
-<div class="table-responsive">
-	<table class="table table-hover">
-		<tr>
-			<th class="col-sm-1 text-center">#</th>
-			<th class="col-sm-2">Task</th>
-			<th class="col-sm-3">Details</th>
-			<th class="col-sm-2">Due</th>
-			<th class="col-sm-1">Created</th>
-		</tr>
-		{% for task in tasks %}
-		<tr type="button" class="task-row-btn" data-toggle="modal" data-target="#task_id_{{task.id}}">
-			<td class="text-center">{{task.sequence}}</td>
-			<td>{{task.task}}</td>
-			<td>{{task.details}}</td>
-			<td>{{task.prettyDueDate}}</td>
-			<td>{{task.create_date}}</td>
-		</tr>
-		{% endfor %}
-	</table>
+<ul class="nav nav-tabs nav-justified">
+	<li class="active"><a data-toggle="tab" href="#open-tasks" class="task-list-tabs">To Do</a></li>
+	<li><a data-toggle="tab" href="#completed-tasks" class="task-list-tabs">Done</a></li>
+</ul>
+<div class="tab-content">
+	<div id="open-tasks" class="tab-pane fade in active mobile-table">
+		<table class="table table-hover">
+			<tr>
+				<th class="col-sm-2">Task</th>
+				<th class="col-sm-3 details-column">Details</th>
+				<th class="col-sm-2">Due</th>
+				<th class="col-sm-1">Created</th>
+			</tr>
+			{% for task in tasks %}
+				{% if task.completed == None %}
+				<tr type="button" class="task-row-btn" data-toggle="modal" data-target="#task_id_{{task.id}}">
+					<td>{{task.task}}</td>
+					<td class="details-column">{{task.details}}</td>
+					<td>{{task.prettyDueDate}}</td>
+					<td>{{task.create_date}}</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+		</table>
+	</div>
+	<div id="completed-tasks" class="tab-pane fade mobile-table">
+		<table class="table table-hover">
+			<tr>
+				<th class="col-sm-2">Task</th>
+				<th class="col-sm-3 details-column">Details</th>
+				<th class="col-sm-2">Due</th>
+				<th class="col-sm-1">Created</th>
+			</tr>
+			{% for task in tasks %}
+				{% if task.completed == 1 %}
+				<tr type="button" class="task-row-btn" data-toggle="modal" data-target="#task_id_{{task.id}}">
+					<td>{{task.task}}</td>
+					<td class="details-column">{{task.details}}</td>
+					<td>{{task.prettyDueDate}}</td>
+					<td>{{task.create_date}}</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+		</table>
+	</div>
 </div>
