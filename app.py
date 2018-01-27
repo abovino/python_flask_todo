@@ -5,17 +5,18 @@ from wtforms.fields.html5 import DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
 import time, datetime, calendar
-import config
+import env_config
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.secret_key='secret123'
 
 # Config MySQL
-app.config['MYSQL_HOST'] = config.MYSQL_HOST
-app.config['MYSQL_USER'] = config.MYSQL_USER
-app.config['MYSQL_PASSWORD'] = config.MYSQL_PASSWORD
-app.config['MYSQL_DB'] = config.MYSQL_DB
-app.config['MYSQL_CURSORCLASS'] = config.MYSQL_CURSORCLASS
+app.config['MYSQL_HOST'] = env_config.MYSQL_HOST
+app.config['MYSQL_USER'] = env_config.MYSQL_USER
+app.config['MYSQL_PASSWORD'] = env_config.MYSQL_PASSWORD
+app.config['MYSQL_DB'] = env_config.MYSQL_DB
+app.config['MYSQL_CURSORCLASS'] = env_config.MYSQL_CURSORCLASS
 
 # init MYSQL
 mysql = MySQL(app)
@@ -213,6 +214,7 @@ def add_task():
 @app.route('/edit_task/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
 def edit_task(id):
+	print('EDIT TASK')
 	# form = TaskForm(request.form)
 	if request.method == 'POST':
 		task = request.form['task']
@@ -238,6 +240,42 @@ def edit_task(id):
 		# Execute query
 		cur.execute('UPDATE todos SET task=%s, details=%s, due_date=%s, update_date=%s WHERE id=%s AND created_by_id=%s', (task, details, due_date, update_date, id, session['userId']))
 
+		# Commit to DB
+		mysql.connection.commit()
+
+		# Close connection to DB
+		cur.close()
+		return redirect(url_for('dashboard'))
+
+	return render_template('add_task.html', form=form)
+
+@app.route('/complete/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def complete_task(id):
+	# form = TaskForm(request.form)
+	print('************************')
+	print('POSTPOSTPOSTPOSTPOST')
+
+	if request.method == 'POST':
+		print('TRUETRUETRUE')
+		
+		# due_date = request.form['date'] + ' ' + request.form['time']
+		# mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+		# due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		
+		update_date = datetime.datetime.now()
+		completed_date = datetime.datetime.now()
+		completed = True
+		taskId = id
+		# mySqlDateTimeFormat = time.strptime(due_date, "%Y-%m-%d %H:%M")
+		# due_date = time.strftime('%Y-%m-%d %H:%M:%S', mySqlDateTimeFormat)
+		
+		# Create Cursor
+		cur = mysql.connection.cursor()
+		print('CURSOR CONNECTION')
+		# Execute query
+		cur.execute('UPDATE todos SET update_date=%s, completed_date=%s, completed=%s WHERE id=%s AND created_by_id=%s', (update_date, completed_date, completed, taskId, session['userId']))
+		print('CURSOR EXECUTE')
 		# Commit to DB
 		mysql.connection.commit()
 
