@@ -167,6 +167,7 @@ def dashboard():
 		tasks[i]['update_date'] = time.strftime('%m/%d/%Y', a)
 
 		tasks[i]['sequence'] = str(i + 1)
+		
 
 	# Close connection
 	cur.close()
