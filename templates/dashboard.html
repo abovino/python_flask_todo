@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-	<h1>Dashboard <small>Welcome, {{session.username}}</small></h1>
-	<button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">
-		Add New Task
-	</button>
+	<h1>Dashboard <small>Welcome, {{session.username}}</small>
+		<button type="button" class="btn btn-success add-task-btn" data-toggle="modal" data-target="#myModal">New Task</button>
+	</h1>
+	
 	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 		{% include 'add_task.html' %}
 	</div>
